@@ -142,6 +142,20 @@ func nextSuffix() string {
 	return strconv.Itoa(int(1e9 + r%1e9))[1:]
 }
 
+// defaultTempDir returns the directory to use for temporary files when the
+// caller omits the directory argument. For a non-root chrooted filesystem the
+// temporary directory is kept inside the chroot boundary (.tmp) so that the
+// resulting paths are reachable through the virtual filesystem. For the root
+// filesystem (Root returns "/") or for filesystems that do not expose a chroot
+// boundary, the platform default (os.TempDir) is used, preserving the existing
+// behaviour.
+func defaultTempDir(fs interface{}) string {
+	if ch, ok := fs.(billy.Chroot); ok && ch.Root() != "/" {
+		return ".tmp"
+	}
+	return os.TempDir()
+}
+
 // TempFile creates a new temporary file in the directory dir with a name
 // beginning with prefix, opens the file for reading and writing, and returns
 // the resulting *os.File. If dir is the empty string, TempFile uses the default
@@ -152,7 +166,7 @@ func nextSuffix() string {
 func TempFile(fs billy.Basic, dir, prefix string) (f billy.File, err error) {
 	// This implementation is based on stdlib ioutil.TempFile.
 	if dir == "" {
-		dir = os.TempDir()
+		dir = defaultTempDir(fs)
 	}
 
 	nconflict := 0
@@ -183,7 +197,7 @@ func TempDir(fs billy.Dir, dir, prefix string) (name string, err error) {
 	// This implementation is based on stdlib ioutil.TempDir
 
 	if dir == "" {
-		dir = os.TempDir()
+		dir = defaultTempDir(fs)
 	}
 
 	nconflict := 0
