@@ -211,15 +211,6 @@ func TempDir(fs billy.Dir, dir, prefix string) (name string, err error) {
 	return
 }
 
-func getTempDir(fs billy.Basic) string {
-	ch, ok := fs.(billy.Chroot)
-	if !ok || ch.Root() == "" || ch.Root() == "/" || ch.Root() == string(filepath.Separator) {
-		return os.TempDir()
-	}
-
-	return ".tmp"
-}
-
 type underlying interface {
 	Underlying() billy.Basic
 }
