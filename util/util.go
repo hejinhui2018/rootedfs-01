@@ -152,7 +152,7 @@ func nextSuffix() string {
 func TempFile(fs billy.Basic, dir, prefix string) (f billy.File, err error) {
 	// This implementation is based on stdlib ioutil.TempFile.
 	if dir == "" {
-		dir = getTempDir(fs)
+		dir = os.TempDir()
 	}
 
 	nconflict := 0
@@ -183,7 +183,7 @@ func TempDir(fs billy.Dir, dir, prefix string) (name string, err error) {
 	// This implementation is based on stdlib ioutil.TempDir
 
 	if dir == "" {
-		dir = getTempDir(fs.(billy.Basic))
+		dir = os.TempDir()
 	}
 
 	nconflict := 0
